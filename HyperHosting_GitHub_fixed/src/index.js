@@ -538,9 +538,12 @@ process.on("uncaughtException", err => {
 });
 
 async function main() {
-  if (!process.env.DISCORD_TOKEN || !process.env.CLIENT_ID || !process.env.GUILD_ID) {
-    throw new Error("`.env` dosyasında DISCORD_TOKEN, CLIENT_ID ve GUILD_ID ayarlanmalı.");
-  }
+ const missing = ["DISCORD_TOKEN", "CLIENT_ID", "GUILD_ID"]
+  .filter(key => !process.env[key]?.trim());
+
+if (missing.length) {
+  throw new Error("Render Environment bölümünde eksik değişkenler: " + missing.join(", "));
+}
   await initStorage();
   const commands = [new SlashCommandBuilder().setName("panel").setDescription("HyperHosting yönetim panelini aç").toJSON()];
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
